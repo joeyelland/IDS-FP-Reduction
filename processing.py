@@ -28,10 +28,10 @@ def find_nth(string, substring, n):
 def alert_type(list):
 	a1 = find_nth(list[0], "[", 1) # Finding the alert Snort signature
 	a2 = find_nth(list[0], "]", 1) # ""
-	a3 = list[0][a1 + 1:a2] # ""
+	a3 = list[0][a1 + 1 : a2] # ""
 
 	a4 = find_nth(list[0], "[", 2) # Finding alert type
-	a5 = list[0][a2 + 2 : a4] #""
+	a5 = list[0][a2 + 2 : a4 - 1] #""
 
 	return a3, a5
 
@@ -65,7 +65,7 @@ def alert_source_ip_port(list):
 
 def alert_dest_ip_port(list):
 	e1 = find_nth(list[2], " ", 2) # Finding dest IP
-	e2 =  find_nth(list[2], ":", 3)# ""
+	e2 = find_nth(list[2], ":", 3)# ""
 	e3 = list[2][e1 + 1 : e2] # ""
 
 	e4 = find_nth(list[2], ":", 3) # Finding dest port
@@ -73,13 +73,30 @@ def alert_dest_ip_port(list):
 	e6 = list[2][e4 + 1 : e5] # ""
 	return e3, e6
 
-#print(alert_classification(content))
-#print(alert_type(content))
-#print alert_date_time(content)
-print alert_dest_ip_port(content)
+def alert_data(list):
+	alert_data_array = []
+	colon_finder = 0
+	i = 0
+
+	while colon_finder != -1 or i == (range(len(list[1]) - 1)):
+		colon_finder = find_nth(list[3], ":", i) 
+		try:	
+			space_finder = list[3][colon_finder:].index(" ")
+		except:
+			pass
+		if(colon_finder != -1):
+			alert_data_array.append(list[3][colon_finder + 1: space_finder + colon_finder])	
+		i = i + 1	
+	return alert_data_array
 
 
-
+"""print(alert_type(content))
+print(alert_classification(content))
+print(alert_date_time(content))
+print(alert_source_ip_port(content))
+print(alert_dest_ip_port(content))
+"""
+print(alert_data(content))
 
 """
 [**] [1:2009358:5] ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine) [**]
