@@ -12,8 +12,6 @@ END SOURCES
 #----------------------------------------#
 """
 
-alert_types = []
-
 with open("test_dataset.pcap") as test_dataset: #Inputting and parsing alert logs line by line 
 	content = test_dataset.readlines()
 
@@ -73,7 +71,7 @@ def alert_dest_ip_port(list):
 	e6 = list[2][e4 + 1 : e5] # ""
 	return e3, e6
 
-def alert_data(list):
+def alert_data(list): 
 	alert_data_array = []
 	colon_finder = 0
 	i = 0
@@ -89,14 +87,51 @@ def alert_data(list):
 		i = i + 1	
 	return alert_data_array
 
+def alert_removal(alert_log):
+	i = 0 
+	next_alert = alert_log.index("\n")
+	while i < (next_alert + 1):
+		x = alert_log[0]
+		alert_log.remove(x)
+		i = i + 1
+	return alert_log
 
-"""print(alert_type(content))
-print(alert_classification(content))
-print(alert_date_time(content))
-print(alert_source_ip_port(content))
-print(alert_dest_ip_port(content))
-"""
-print(alert_data(content))
+def alert_appending(alert_log):
+	alert_types = []
+	
+	alert_types.append(alert_classification(content)[0])
+	alert_types.append(alert_classification(content)[1])
+	alert_types.append(alert_date_time(content)[0])
+	alert_types.append(alert_date_time(content)[1])
+	alert_types.append(alert_source_ip_port(content)[0])
+	alert_types.append(alert_source_ip_port(content)[1])
+	alert_types.append(alert_dest_ip_port(content)[0])
+	alert_types.append(alert_dest_ip_port(content)[1])
+		
+	return alert_types
+
+def alert_number(alert_log):
+	z = 0
+	for i in alert_log:
+		if i == "\n":
+			z = z + 1
+	return z
+
+def alert_grouping(alert_log):
+	alert_full = []
+	i = 0
+	alert_num = alert_number(content)
+
+	while i < alert_num:
+		alert_full.append(alert_appending(alert_log))
+		alert_removal(alert_log)
+		i = i + 1
+	return alert_full
+
+print(alert_number(content))
+
+for i in alert_grouping(content):
+	print(i)
 
 """
 [**] [1:2009358:5] ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine) [**]
