@@ -12,7 +12,7 @@ END SOURCES
 #----------------------------------------#
 """
 
-with open("test_dataset.pcap") as test_dataset: #Inputting and parsing alert logs line by line 
+with open("test_dataset_full.pcap") as test_dataset: #Inputting and parsing alert logs line by line 
 	content = test_dataset.readlines()
 
 #----------------------------------------# Start source [1]
@@ -96,6 +96,7 @@ def alert_removal(alert_log):
 		i = i + 1
 	return alert_log
 
+
 def alert_appending(alert_log):
 	alert_types = []
 	
@@ -120,24 +121,44 @@ def alert_number(alert_log):
 def alert_grouping(alert_log):
 	alert_full = []
 	i = 0
+	x = 0
 	alert_num = alert_number(content)
 
 	while i < alert_num:
 		alert_full.append(alert_appending(alert_log))
 		alert_removal(alert_log)
+		print(alert_full[i])
 		i = i + 1
+	print(x)
 	return alert_full
 
-print(alert_number(content))
 
-for i in alert_grouping(content):
-	print(i)
+all_types = []
+for i in content:
+	if i.startswith("[Classification:"):
+		b1 = i.index(":") # Finding the alert classification
+		b2 = i.index("]") # ""
+		b3 = i[b1 + 2 : b2] # ""
+		if(b3 not in all_types):
+			all_types.append(b3)
+
+for i in all_types:
+	print i
+
+
+
+
 
 """
-[**] [1:2009358:5] ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine) [**]
-[Classification: Web Application Attack] [Priority: 1] 
-03/16-07:30:00.000000 192.168.202.79:50465 -> 192.168.229.251:80
-TCP TTL:127 TOS:0x0 ID:1573 IpLen:20 DgmLen:218 DF
-***AP**F Seq: 0x9EB207E5  Ack: 0xB58E1793  Win: 0xFA4A  TcpLen: 32
-[Xref => http://doc.emergingthreats.net/2009358]
+x = 0
+for i in content:
+	if(i == "[Classification: Unsuccessful User Privilege Gain] [Priority: 1] \n"):
+		x = x + 1
+	else:
+		x = x
+
+print x
+alert_grouping(content)
+print(alert_number(content))
+166491
 """
