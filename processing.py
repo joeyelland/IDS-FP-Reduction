@@ -132,7 +132,7 @@ def alert_grouping(alert_log):
 	print(x)
 	return alert_full
 
-
+#Checking all alert types
 all_types = []
 for i in content:
 	if i.startswith("[Classification:"):
@@ -142,12 +142,24 @@ for i in content:
 		if(b3 not in all_types):
 			all_types.append(b3)
 
-for i in all_types:
-	print i
 
+#Checking all alert reasons
+alert_classes = []
+for x in content:
+	if x.startswith("[**]"):
+		a2 = find_nth(x, "]", 1) 
+		a4 = find_nth(x, "[", 2)
+		a5 = x[a2 + 2 : a4 - 1]
+		if(a5 not in alert_classes):
+			alert_classes.append(a5)
 
+alert_classes.sort(key=str.lower)
 
-
+for i in alert_classes:
+	print i			
+		
+#for i in all_types:
+#	print i
 
 """
 x = 0
