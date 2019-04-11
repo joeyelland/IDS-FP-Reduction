@@ -24,14 +24,12 @@ def find_nth(string, substring, n):
 #----------------------------------------# End source [1]
 
 def alert_type(list):
-	a1 = find_nth(list[0], "[", 1) # Finding the alert Snort signature
-	a2 = find_nth(list[0], "]", 1) # ""
-	a3 = list[0][a1 + 1 : a2] # ""
+	a2 = find_nth(list[0], "]", 1) # Finding the alert Snort signature
 
 	a4 = find_nth(list[0], "[", 2) # Finding alert type
 	a5 = list[0][a2 + 2 : a4 - 1] #""
 
-	return a3, a5
+	return a5
 
 def alert_classification(list):
 	b1 = list[1].index(":") # Finding the alert classification
@@ -51,6 +49,43 @@ def alert_date_time(list):
 	c3 = list[2].index(" ")# Finding alert time
 	c4 = list[2][c1 + 1 : c3]
 	return c2, c4
+
+"""
+[**] [1:402:7] ICMP Destination Unreachable Port Unreachable [**]
+[Classification: Misc activity] [Priority: 3] 
+03/16-07:30:00.640000 192.168.27.203 -> 192.168.202.100
+ICMP TTL:63 TOS:0xC0 ID:45471 IpLen:20 DgmLen:56
+Type:3  Code:3  DESTINATION UNREACHABLE: PORT UNREACHABLE
+** ORIGINAL DATAGRAM DUMP:
+192.168.202.100:45658 -> 192.168.27.203:38293
+UDP TTL:46 TOS:0x0 ID:16182 IpLen:20 DgmLen:28
+Len: 0  Csum: 20589
+** END OF DUMP
+"""
+
+def exception_source_ip_port(list): # EXCEPTION CASE
+	z2 = list[6].index(":") # Finding source IP
+	z3 = list[6][: z2] # ""
+
+	z4 = list[6].index(" ") # Finding source port
+	z5 = list[6][z2 + 1 : z4] # ""
+	return z3, z5
+
+def exception_dest_ip_port(list): # EXCEPTION CASE
+	y1 = find_nth(list[6], " ", 1) # Finding dest IP
+	y2 = find_nth(list[6], ":", 1)
+	y3 = list[6][y1 + 1 : y2] # ""
+
+	y4 = list[6].index(" ") # Finding dests port
+	y5 = list[6].index("\n") # ""
+	y6 = list[6][y2 + 1 : y5] # ""
+	return y3, y6
+
+def alert_exception(exception):
+	if(exception[0] == "Misc activity"):
+		return "True", exception_source_ip_port(content), exception_dest_ip_port(content)
+	else:
+		return "False"
 
 def alert_source_ip_port(list):
 	d1 = list[2].index(" ") # Finding source IP
@@ -100,14 +135,27 @@ def alert_removal(alert_log):
 def alert_appending(alert_log):
 	alert_types = []
 	
-	alert_types.append(alert_classification(content)[0])
-	alert_types.append(alert_classification(content)[1])
-	alert_types.append(alert_date_time(content)[0])
-	alert_types.append(alert_date_time(content)[1])
-	alert_types.append(alert_source_ip_port(content)[0])
-	alert_types.append(alert_source_ip_port(content)[1])
-	alert_types.append(alert_dest_ip_port(content)[0])
-	alert_types.append(alert_dest_ip_port(content)[1])
+	exception_case = alert_exception(alert_classification(content))
+
+	if(exception_case[0] == "True"):
+		alert_types.append(alert_classification(content)[0])
+		alert_types.append(alert_classification(content)[1])
+		alert_types.append(alert_date_time(content)[0])
+		alert_types.append(alert_date_time(content)[1])
+		alert_types.append(exception_case[1][0])
+		alert_types.append(exception_case[1][1])
+		alert_types.append(exception_case[2][0])
+		alert_types.append(exception_case[2][1])
+	else:
+		#alert_types.append(alert_type(content))
+		alert_types.append(alert_classification(content)[0])
+		alert_types.append(alert_classification(content)[1])
+		alert_types.append(alert_date_time(content)[0])
+		alert_types.append(alert_date_time(content)[1])
+		alert_types.append(alert_source_ip_port(content)[0])
+		alert_types.append(alert_source_ip_port(content)[1])
+		alert_types.append(alert_dest_ip_port(content)[0])
+		alert_types.append(alert_dest_ip_port(content)[1])
 		
 	return alert_types
 
@@ -129,9 +177,19 @@ def alert_grouping(alert_log):
 		alert_removal(alert_log)
 		print(alert_full[i])
 		i = i + 1
-	print(x)
 	return alert_full
 
+
+#print(alert_exception(alert_classification(content)))
+
+alert_grouping(content)
+#for i in alert_grouping(content):
+#	print i
+"""
+"""
+
+
+"""
 #Checking all alert types
 all_types = []
 for i in content:
@@ -150,27 +208,8 @@ for x in content:
 		a2 = find_nth(x, "]", 1) 
 		a4 = find_nth(x, "[", 2)
 		a5 = x[a2 + 2 : a4 - 1]
-		if(a5 not in alert_classes):
-			alert_classes.append(a5)
+		alert_classes.append(a5)
 
-alert_classes.sort(key=str.lower)
 
-for i in alert_classes:
-	print i			
-		
-#for i in all_types:
-#	print i
-
-"""
-x = 0
-for i in content:
-	if(i == "[Classification: Unsuccessful User Privilege Gain] [Priority: 1] \n"):
-		x = x + 1
-	else:
-		x = x
-
-print x
-alert_grouping(content)
-print(alert_number(content))
 166491
 """
