@@ -6,7 +6,8 @@
 Author: Joe Yelland // B525320 // COC251 
 #----------------------------------------#
 STAGE 1 - Mapper 
-WRITE ABOUT WHAT THE MAPPER IS DOING
+Input: Raw Snort IDS Alert log file
+Output: Tuples of the form (Alarm Type, Source-port, Source-IP, Dest-port, Dest-IP, Time) contained within a list
 #----------------------------------------#
 START SOURCES
 [1] - https://stackoverflow.com/questions/1883980/find-the-nth-occurrence-of-substring-in-a-string
@@ -55,19 +56,6 @@ def alert_date_time(list):
 	c4 = list[2][c1 + 1 : c3]
 	return c2, c4
 
-"""
-[**] [1:402:7] ICMP Destination Unreachable Port Unreachable [**]
-[Classification: Misc activity] [Priority: 3] 
-03/16-07:30:00.640000 192.168.27.203 -> 192.168.202.100
-ICMP TTL:63 TOS:0xC0 ID:45471 IpLen:20 DgmLen:56
-Type:3  Code:3  DESTINATION UNREACHABLE: PORT UNREACHABLE
-** ORIGINAL DATAGRAM DUMP:
-192.168.202.100:45658 -> 192.168.27.203:38293
-UDP TTL:46 TOS:0x0 ID:16182 IpLen:20 DgmLen:28
-Len: 0  Csum: 20589
-** END OF DUMP
-"""
-
 def exception_source_ip_port(list): # EXCEPTION CASE
 	z2 = list[6].index(":") # Finding source IP
 	z3 = list[6][: z2] # ""
@@ -87,10 +75,29 @@ def exception_dest_ip_port(list): # EXCEPTION CASE
 	return y3, y6
 
 def alert_exception(exception):
-	if(exception[0] == "Misc activity"):
+	if((exception.index("** ORIGINAL DATAGRAM DUMP:\n")) < 10):
 		return "True", exception_source_ip_port(content), exception_dest_ip_port(content)
 	else:
 		return "False"
+"""
+[**] [1:402:7] ICMP Destination Unreachable Port Unreachable [**]
+[Classification: Misc activity] [Priority: 3] 
+03/16-07:30:00.060000 192.168.27.25 -> 192.168.202.100
+ICMP TTL:127 TOS:0x0 ID:25932 IpLen:20 DgmLen:56
+Type:3  Code:3  DESTINATION UNREACHABLE: PORT UNREACHABLE
+** ORIGINAL DATAGRAM DUMP:
+192.168.202.100:45660 -> 192.168.27.25:19322
+UDP TTL:37 TOS:0x0 ID:59923 IpLen:20 DgmLen:28
+Len: 0  Csum: 39736
+** END OF DUMP
+
+[**] [1:2049:4] MS-SQL ping attempt [**]
+[Classification: Misc activity] [Priority: 3] 
+03/16-07:42:07.620000 192.168.202.79:57173 -> 255.255.255.255:1434
+UDP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:29 DF
+Len: 1
+[Xref => http://cgi.nessus.org/plugins/dump.php3?id=10674]
+"""
 
 def alert_source_ip_port(list):
 	d1 = list[2].index(" ") # Finding source IP
@@ -140,9 +147,11 @@ def alert_removal(alert_log):
 def alert_appending(alert_log):
 	alert_types = []
 	
-	exception_case = alert_exception(alert_classification(content))
+	next_alert = alert_log.index("\n")
+	exception_case = alert_exception(content)
 
 	if(exception_case[0] == "True"):
+		#alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content)[0])
 		alert_types.append(alert_classification(content)[1])
 		alert_types.append(alert_date_time(content)[0])
@@ -185,15 +194,11 @@ def alert_grouping(alert_log):
 	return alert_full
 
 
-"""
-
 alert_grouping(content)
-#for i in alert_grouping(content):
-#	print i
+for i in alert_grouping(content):
+	print i
 """
 
-
-"""
 #Checking all alert types
 all_types = []
 for i in content:
@@ -216,4 +221,8 @@ for x in content:
 
 
 166491
+
+
+
+
 """
