@@ -12,6 +12,8 @@ END SOURCES
 #----------------------------------------#
 """
 
+# MOVING THIS STEP TO MAPPER
+
 with open("test_dataset_full.pcap") as test_dataset: #Inputting and parsing alert logs line by line 
 	content = test_dataset.readlines()
 
@@ -180,12 +182,11 @@ def alert_grouping(alert_log):
 	return alert_full
 
 
-#print(alert_exception(alert_classification(content)))
+"""
 
 alert_grouping(content)
 #for i in alert_grouping(content):
 #	print i
-"""
 """
 
 
