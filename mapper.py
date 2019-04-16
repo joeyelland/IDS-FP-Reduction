@@ -18,7 +18,7 @@ END SOURCES
 import sys
 import re
 
-with open("test_dataset_small.pcap") as test_dataset: #Inputting and parsing alert logs line by line 
+with open("test_dataset_full.pcap") as test_dataset: #Inputting and parsing alert logs line by line 
 	content = test_dataset.readlines()
 
 #----------------------------------------# Start source [1]
@@ -46,7 +46,7 @@ def alert_classification(list):
 	b5 = len(list[1]) - 3 # ""
 	b6 = list[1][b4 + 2 : b5] # ""
 	
-	return b3, b6
+	return b3
 
 def alert_date_time(list):
 	c1 = list[2].index("-") # Finding alert date
@@ -102,23 +102,25 @@ def alert_removal(alert_log):
 		i = i + 1
 	return alert_log
 
-def alert_exception(exception):
-	next_alert = exception.index("\n")
-	next_group = exception[2].index(" ")
-
-	if("** ORIGINAL DATAGRAM DUMP:\n" in exception[ : next_alert]):
-		return "Case_1", exception_source_ip_port(content), exception_dest_ip_port(content)
-	elif(":" not in exception[2][next_group:]):
-		return "Case_2"
-	else:
-		return "Case_3"
-
 def alert_number(alert_log):
 	z = 0
 	for i in alert_log:
 		if i == "\n":
 			z = z + 1
 	return z
+
+def alert_exception(exception):
+	next_alert = exception.index("\n")
+	next_group = exception[2].index(" ")
+
+	if("** ORIGINAL DATAGRAM DUMP:\n" in exception[ : next_alert] and (":" in exception[6])):
+		return "Case_1", exception_source_ip_port(content), exception_dest_ip_port(content)
+	elif(("** ORIGINAL DATAGRAM DUMP:\n" in exception[ : next_alert]) and (":" not in exception[6])):
+		return "Case_2"
+	elif(":" not in exception[2][next_group:]):
+		return "Case_3"
+	else:
+		return "Case_4"
 
 def alert_appending(alert_log):
 	alert_types = []
@@ -128,27 +130,27 @@ def alert_appending(alert_log):
 
 	if(exception_case[0] == "Case_1"):
 		#alert_types.append(alert_type(content))
-		alert_types.append(alert_classification(content)[0])
-		alert_types.append(alert_classification(content)[1])
+		alert_types.append(alert_classification(content))
 		alert_types.append(alert_date_time(content)[0])
 		alert_types.append(alert_date_time(content)[1])
 		alert_types.append(exception_case[1][0])
 		alert_types.append(exception_case[1][1])
 		alert_types.append(exception_case[2][0])
 		alert_types.append(exception_case[2][1])
-	elif(exception_case[0] == "Case_2"):
+	elif(exception_case == "Case_2"):
+		pass
+	elif(exception_case == "Case_3"):
 		pass
 	else:
 		#alert_types.append(alert_type(content))
-		alert_types.append(alert_classification(content)[0])
-		alert_types.append(alert_classification(content)[1])
+		alert_types.append(alert_classification(content))
 		alert_types.append(alert_date_time(content)[0])
 		alert_types.append(alert_date_time(content)[1])
 		alert_types.append(alert_source_ip_port(content)[0])
 		alert_types.append(alert_source_ip_port(content)[1])
 		alert_types.append(alert_dest_ip_port(content)[0])
 		alert_types.append(alert_dest_ip_port(content)[1])
-		
+
 	return alert_types
 
 
@@ -158,23 +160,22 @@ def alert_grouping(alert_log):
 	i = 0
 	x = 0
 	alert_num = alert_number(content)
-
 	while i < alert_num:
-		alert_full.append(alert_appending(alert_log))
-		alert_removal(alert_log)		
-
-		with open("mapper_output.txt","w+") as output:
-			for x in alert_full:
-				output.write("%s\n" % x)
+		q1 = alert_appending(alert_log)
+		if(len(q1) == 0):
+			alert_removal(alert_log)
+		else:
+			alert_full.append(q1)
+			alert_removal(alert_log)	
+			print(i, q1)
 
 		i = i + 1
 	return alert_full
 
-
+#print("Hello World!")
 
 #print(alert_exception(content))
 alert_grouping(content)
-
 
 """
 for i in alert_grouping(content):
@@ -201,5 +202,5 @@ for x in content:
 		alert_classes.append(a5)
 
 
-166491
+166,491
 """
