@@ -29,7 +29,11 @@ def find_nth(string, substring, n):
 	return len(string) - len(parts[-1]) - len(substring)
 #----------------------------------------# End source [1]
 
-def alert_type(list):
+def string_inversion(input): # Inverts a string that is given as input
+	output = input[::-1] # Inversion using slicing
+	return output
+
+def alert_type(list):# FINDS ALERT TYPE
 	a2 = find_nth(list[0], "]", 1) # Finding the alert Snort signature
 
 	a4 = find_nth(list[0], "[", 2) # Finding alert type
@@ -37,7 +41,7 @@ def alert_type(list):
 
 	return a5
 
-def alert_classification(list):
+def alert_classification(list): # FINDS ALERT CLASSIFICATION
 	b1 = list[1].index(":") # Finding the alert classification
 	b2 = list[1].index("]") # ""
 	b3 = list[1][b1 + 2:b2] # ""
@@ -48,7 +52,7 @@ def alert_classification(list):
 	
 	return b3
 
-def alert_date_time(list):
+def alert_date_time(list): # FINDS DATE AND TIME OF ALERT
 	c1 = list[2].index("-") # Finding alert date
 	c2 = list[2][: c1] # ""
 
@@ -56,7 +60,7 @@ def alert_date_time(list):
 	c4 = list[2][c1 + 1 : c3]
 	return c2, c4
 
-def alert_source_ip_port(list):
+def alert_source_ip_port(list): # FINDS SOURCE PORT AND IP
 	d1 = list[2].index(" ") # Finding source IP
 	d2 = find_nth(list[2], ":", 2) # ""
 	d3 = list[2][d1 + 1: d2] # ""
@@ -65,7 +69,7 @@ def alert_source_ip_port(list):
 	d5 = list[2][d2 + 1 : d4] # ""
 	return d3, d5
 
-def alert_dest_ip_port(list):
+def alert_dest_ip_port(list): # FINDS DESTINATION PORT AND IP
 	e1 = find_nth(list[2], " ", 2) # Finding dest IP
 	e2 = find_nth(list[2], ":", 3)# ""
 	e3 = list[2][e1 + 1 : e2] # ""
@@ -75,7 +79,7 @@ def alert_dest_ip_port(list):
 	e6 = list[2][e4 + 1 : e5] # ""
 	return e3, e6
 
-def exception_source_ip_port(list): # EXCEPTION CASE
+def exception_case_1(list): # EXCEPTION CASE
 	z2 = list[6].index(":") # Finding source IP
 	z3 = list[6][: z2] # ""
 
@@ -83,7 +87,7 @@ def exception_source_ip_port(list): # EXCEPTION CASE
 	z5 = list[6][z2 + 1 : z4] # ""
 	return z3, z5
 
-def exception_dest_ip_port(list): # EXCEPTION CASE
+def exception_case_1_1(list): # EXCEPTION CASE
 	y1 = find_nth(list[6], " ", 1) # Finding dest IP
 	y2 = find_nth(list[6], ":", 1)
 	y3 = list[6][y1 + 1 : y2] # ""
@@ -93,22 +97,18 @@ def exception_dest_ip_port(list): # EXCEPTION CASE
 	y6 = list[6][y2 + 1 : y5] # ""
 	return y3, y6
 
-def string_inversion(input): # Inverts a string that is given as input
-	output = input[::-1] # Inversion using slicing
-	return output
-
-def exception_case_4(exception):
-	t1 = string_inversion(exception)
+def exception_case_4(exception): # EXCEPTION CASE
+	t1 = string_inversion(exception[2])
 	t2 = t1.index(":")
-	t3 = string_inversion(t1[: t2])
-	
+	t3 = string_inversion(t1[: t2]).rstrip()
+
 	t5 = find_nth(t1, " " , 1)
 	t6 = t1[t5:].index(":")
-	t7 = string_inversion(t1[t5 + 1 : t6 + t5])
+	t7 = string_inversion(t1[t5 + 1 : t6 + t5]).rstrip()
 	
-	return t3, t7
+	return t7,t3
 
-def alert_removal(alert_log):
+def alert_removal(alert_log): # REMOVES THE NEXT ALERT IN THE LIST
 	i = 0 
 	next_alert = alert_log.index("\n")
 	while i < (next_alert + 1):
@@ -117,43 +117,43 @@ def alert_removal(alert_log):
 		i = i + 1
 	return alert_log
 
-def alert_number(alert_log):
+def alert_number(alert_log): # FINDS THE NUMBER OF ALERTS IN THE LIST
 	z = 0
 	for i in alert_log:
 		if i == "\n":
 			z = z + 1
 	return z
 
-def alert_exception(exception): #Finds what alert is currently being read and finds what to append
+def alert_exception(exception): # FINDS ALERT DATA AND DECIDES ON EXCEPTION CASE
 	next_alert = exception.index("\n")
 	next_group = exception[2].index(" ")
 
 	if("** ORIGINAL DATAGRAM DUMP:\n" in exception[ : next_alert] and (":" in exception[6])):
-		return "Case_1", exception_source_ip_port(content), exception_dest_ip_port(content)
+		return "Case_1"
 	elif(("** ORIGINAL DATAGRAM DUMP:\n" in exception[ : next_alert]) and (":" not in exception[6])):
 		return "Case_2"
 	elif(":" not in exception[2][next_group:]):
 		return "Case_3"
-	elif(WHAT?):
+	elif(exception[2].count(":") > 4):
 		return "Case_4"
 	else:
 		return "Case_5"
 
-def alert_appending(alert_log):
+def alert_appending(alert_log): # APPENDS THE CORRECT DATA DEPENDING IN ALERT_EXCEPTION OUTPUT
 	alert_types = []
 	
 	next_alert = alert_log.index("\n")
 	exception_case = alert_exception(content)
 
-	if(exception_case[0] == "Case_1"):
+	if(exception_case == "Case_1"):
 		#alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
+ 		alert_types.append(exception_case_1(content)[1])
+		alert_types.append(exception_case_1(content)[0])
+		alert_types.append(exception_case_1_1(content)[1])
+		alert_types.append(exception_case_1_1(content)[0])
 		alert_types.append(alert_date_time(content)[0])
 		alert_types.append(alert_date_time(content)[1])
-		alert_types.append(exception_case[1][0])
- 		alert_types.append(exception_case[1][1])
-		alert_types.append(exception_case[2][0])
-		alert_types.append(exception_case[2][1])
 	elif(exception_case == "Case_2"):
 		pass
 	elif(exception_case == "Case_3"):
@@ -161,31 +161,31 @@ def alert_appending(alert_log):
 	elif(exception_case == "Case_4"):
 		#alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
-		alert_types.append(alert_date_time(content)[0])
-		alert_types.append(alert_date_time(content)[1])
+		alert_types.append(exception_case_4(content)[0])
 		alert_types.append("Undefined") # IP Not defined
 		alert_types.append(exception_case_4(content)[1])
 		alert_types.append("Undefined") # IP Not defined
-		alert_types.append(exception_case_4(content)[0])
+		alert_types.append(alert_date_time(content)[0])
+		alert_types.append(alert_date_time(content)[1])
 	else:
 		#alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
+		alert_types.append(alert_source_ip_port(content)[1])
+		alert_types.append(alert_source_ip_port(content)[0])
+		alert_types.append(alert_dest_ip_port(content)[1])
+		alert_types.append(alert_dest_ip_port(content)[0])
 		alert_types.append(alert_date_time(content)[0])
 		alert_types.append(alert_date_time(content)[1])
-		alert_types.append(alert_source_ip_port(content)[0])
-		alert_types.append(alert_source_ip_port(content)[1])
-		alert_types.append(alert_dest_ip_port(content)[0])
-		alert_types.append(alert_dest_ip_port(content)[1])
 
 	return alert_types
 
-
-def alert_grouping(alert_log):
-
+def alert_grouping(alert_log): # RUNS THROUGH ALERT LOG DATA 
 	alert_full = []
 	i = 0
 	x = 0
 	alert_num = alert_number(content)
+	mapper_output = open("mapper_output.txt","w+")
+
 	while i < alert_num:
 		q1 = alert_appending(alert_log)
 		if(len(q1) == 0):
@@ -193,37 +193,8 @@ def alert_grouping(alert_log):
 		else:
 			alert_full.append(q1)
 			alert_removal(alert_log)	
-			print(i, q1)
-
 		i = i + 1
 	return alert_full
 
 
-#print(alert_exception(content))
-#alert_grouping(content)
-
-"""
-for i in alert_grouping(content):
-	print i
-
-#Checking all alert types
-all_types = []
-for i in content:
-	if i.startswith("[Classification:"):
-		b1 = i.index(":") # Finding the alert classification
-		b2 = i.index("]") # ""
-		b3 = i[b1 + 2 : b2] # ""
-		if(b3 not in all_types):
-			all_types.append(b3)
-
-#Checking all alert reasons
-alert_classes = []
-for x in content:
-	if x.startswith("[**]"):
-		a2 = find_nth(x, "]", 1) 
-		a4 = find_nth(x, "[", 2)
-		a5 = x[a2 + 2 : a4 - 1]
-		alert_classes.append(a5)
-
-166,491
-"""
+alert_grouping(content)
