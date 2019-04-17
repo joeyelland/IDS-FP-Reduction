@@ -93,6 +93,21 @@ def exception_dest_ip_port(list): # EXCEPTION CASE
 	y6 = list[6][y2 + 1 : y5] # ""
 	return y3, y6
 
+def string_inversion(input): # Inverts a string that is given as input
+	output = input[::-1] # Inversion using slicing
+	return output
+
+def exception_case_4(exception):
+	t1 = string_inversion(exception)
+	t2 = t1.index(":")
+	t3 = string_inversion(t1[: t2])
+	
+	t5 = find_nth(t1, " " , 1)
+	t6 = t1[t5:].index(":")
+	t7 = string_inversion(t1[t5 + 1 : t6 + t5])
+	
+	return t3, t7
+
 def alert_removal(alert_log):
 	i = 0 
 	next_alert = alert_log.index("\n")
@@ -109,7 +124,7 @@ def alert_number(alert_log):
 			z = z + 1
 	return z
 
-def alert_exception(exception):
+def alert_exception(exception): #Finds what alert is currently being read and finds what to append
 	next_alert = exception.index("\n")
 	next_group = exception[2].index(" ")
 
@@ -119,8 +134,10 @@ def alert_exception(exception):
 		return "Case_2"
 	elif(":" not in exception[2][next_group:]):
 		return "Case_3"
-	else:
+	elif(WHAT?):
 		return "Case_4"
+	else:
+		return "Case_5"
 
 def alert_appending(alert_log):
 	alert_types = []
@@ -134,13 +151,22 @@ def alert_appending(alert_log):
 		alert_types.append(alert_date_time(content)[0])
 		alert_types.append(alert_date_time(content)[1])
 		alert_types.append(exception_case[1][0])
-		alert_types.append(exception_case[1][1])
+ 		alert_types.append(exception_case[1][1])
 		alert_types.append(exception_case[2][0])
 		alert_types.append(exception_case[2][1])
 	elif(exception_case == "Case_2"):
 		pass
 	elif(exception_case == "Case_3"):
 		pass
+	elif(exception_case == "Case_4"):
+		#alert_types.append(alert_type(content))
+		alert_types.append(alert_classification(content))
+		alert_types.append(alert_date_time(content)[0])
+		alert_types.append(alert_date_time(content)[1])
+		alert_types.append("Undefined") # IP Not defined
+		alert_types.append(exception_case_4(content)[1])
+		alert_types.append("Undefined") # IP Not defined
+		alert_types.append(exception_case_4(content)[0])
 	else:
 		#alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
@@ -172,10 +198,9 @@ def alert_grouping(alert_log):
 		i = i + 1
 	return alert_full
 
-#print("Hello World!")
 
 #print(alert_exception(content))
-alert_grouping(content)
+#alert_grouping(content)
 
 """
 for i in alert_grouping(content):
@@ -191,7 +216,6 @@ for i in content:
 		if(b3 not in all_types):
 			all_types.append(b3)
 
-
 #Checking all alert reasons
 alert_classes = []
 for x in content:
@@ -200,7 +224,6 @@ for x in content:
 		a4 = find_nth(x, "[", 2)
 		a5 = x[a2 + 2 : a4 - 1]
 		alert_classes.append(a5)
-
 
 166,491
 """
