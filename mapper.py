@@ -29,7 +29,7 @@ def find_nth(string, substring, n):
 	return len(string) - len(parts[-1]) - len(substring)
 #----------------------------------------# End source [1]
 
-def string_inversion(input): # Inverts a string that is given as input
+def string_inversion(input): # INPUTS A STRING AND OUTPUTS ITS REVERSE
 	output = input[::-1] # Inversion using slicing
 	return output
 
@@ -97,7 +97,7 @@ def exception_case_1_1(list): # EXCEPTION CASE
 	y6 = list[6][y2 + 1 : y5] # ""
 	return y3, y6
 
-def exception_case_4(exception): # EXCEPTION CASE
+def exception_case_5(exception): # EXCEPTION CASE
 	t1 = string_inversion(exception[2])
 	t2 = t1.index(":")
 	t3 = string_inversion(t1[: t2]).rstrip()
@@ -134,10 +134,12 @@ def alert_exception(exception): # FINDS ALERT DATA AND DECIDES ON EXCEPTION CASE
 		return "Case_2"
 	elif(":" not in exception[2][next_group:]):
 		return "Case_3"
-	elif(exception[2].count(":") > 4):
+	elif(" :: " in exception[2]):
 		return "Case_4"
-	else:
+	elif(exception[2].count(":") > 4):
 		return "Case_5"
+	else:
+		return "Case_6"
 
 def alert_appending(alert_log): # APPENDS THE CORRECT DATA DEPENDING IN ALERT_EXCEPTION OUTPUT
 	alert_types = []
@@ -146,7 +148,7 @@ def alert_appending(alert_log): # APPENDS THE CORRECT DATA DEPENDING IN ALERT_EX
 	exception_case = alert_exception(content)
 
 	if(exception_case == "Case_1"):
-		#alert_types.append(alert_type(content))
+		alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
  		alert_types.append(exception_case_1(content)[1])
 		alert_types.append(exception_case_1(content)[0])
@@ -159,16 +161,25 @@ def alert_appending(alert_log): # APPENDS THE CORRECT DATA DEPENDING IN ALERT_EX
 	elif(exception_case == "Case_3"):
 		pass
 	elif(exception_case == "Case_4"):
-		#alert_types.append(alert_type(content))
+		alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
-		alert_types.append(exception_case_4(content)[0])
+		alert_types.append("Undefined") # Source IP Not defined
+		alert_types.append("Undefined") # Source Port Not defined
+		alert_types.append("Undefined") # Dest IP Not defined
+		alert_types.append("Undefined") # Dest Port Not defined
+		alert_types.append(alert_date_time(content)[0])
+		alert_types.append(alert_date_time(content)[1])
+	elif(exception_case == "Case_5"):
+		alert_types.append(alert_type(content))
+		alert_types.append(alert_classification(content))
+		alert_types.append(exception_case_5(content)[0])
 		alert_types.append("Undefined") # IP Not defined
-		alert_types.append(exception_case_4(content)[1])
+		alert_types.append(exception_case_5(content)[1])
 		alert_types.append("Undefined") # IP Not defined
 		alert_types.append(alert_date_time(content)[0])
 		alert_types.append(alert_date_time(content)[1])
 	else:
-		#alert_types.append(alert_type(content))
+		alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
 		alert_types.append(alert_source_ip_port(content)[1])
 		alert_types.append(alert_source_ip_port(content)[0])
@@ -187,14 +198,15 @@ def alert_grouping(alert_log): # RUNS THROUGH ALERT LOG DATA
 	mapper_output = open("mapper_output.txt","w+")
 
 	while i < alert_num:
+		print(i)
 		q1 = alert_appending(alert_log)
 		if(len(q1) == 0):
 			alert_removal(alert_log)
 		else:
 			alert_full.append(q1)
-			alert_removal(alert_log)	
+			alert_removal(alert_log)
+			mapper_output.write("%s\n" % q1)
 		i = i + 1
 	return alert_full
 
-
-alert_grouping(content)
+alert_grouping(content) # CALLING FUNCTION
