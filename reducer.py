@@ -18,3 +18,5 @@ import ast
 
 for lines in sys.stdin: # Gets the mapper output
 	words = lines # Puts it into an a variable 
+
+print(lines)

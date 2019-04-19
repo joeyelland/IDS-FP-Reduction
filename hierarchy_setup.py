@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 priv_ports = list(range(1,1025))
 priv_port_list = []
 
@@ -58,3 +59,6 @@ def find_shortest_path(graph, start, end, path=[]):
 
 #print(find_shortest_path(graph, 'A', 'D'))
 #print(find_path(graph, 'A', 'D'))
+=======
+
+>>>>>>> 03ef30173ac72fa97129879bee156cf07b7cc7c1
