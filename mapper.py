@@ -10,7 +10,8 @@ Input: Raw Snort IDS Alert log file
 Output: Tuples of the form (Alarm Type, Source-port, Source-IP, Dest-port, Dest-IP, Time) contained within a list
 #----------------------------------------#
 START SOURCES
-[1] - https://stackoverflow.com/questions/1883980/find-the-nth-occurrence-of-substring-in-a-string
+[1] - https://stackoverflow.com/questions/1883980/find-the-nth-occurrence-of-substring-in-a-string/
+[2] - https://www.python.org/doc/essays/graphs/
 END SOURCES
 #----------------------------------------#
 """
@@ -51,14 +52,6 @@ def alert_classification(list): # FINDS ALERT CLASSIFICATION
 	b6 = list[1][b4 + 2 : b5] # ""
 	
 	return b3
-
-def alert_date_time(list): # FINDS DATE AND TIME OF ALERT
-	c1 = list[2].index("-") # Finding alert date
-	c2 = list[2][: c1] # ""
-
-	c3 = list[2].index(" ")# Finding alert time
-	c4 = list[2][c1 + 1 : c3]
-	return c2, c4
 
 def alert_source_ip_port(list): # FINDS SOURCE PORT AND IP
 	d1 = list[2].index(" ") # Finding source IP
@@ -148,14 +141,12 @@ def alert_appending(alert_log): # APPENDS THE CORRECT DATA DEPENDING IN ALERT_EX
 	exception_case = alert_exception(content)
 
 	if(exception_case == "Case_1"):
-		alert_types.append(alert_type(content))
-		alert_types.append(alert_classification(content))
- 		alert_types.append(exception_case_1(content)[1])
-		alert_types.append(exception_case_1(content)[0])
-		alert_types.append(exception_case_1_1(content)[1])
-		alert_types.append(exception_case_1_1(content)[0])
-		alert_types.append(alert_date_time(content)[0])
-		alert_types.append(alert_date_time(content)[1])
+		alert_types.append(alert_type(content)) #0
+		alert_types.append(alert_classification(content)) #1
+ 		alert_types.append(exception_case_1(content)[1]) #2
+		alert_types.append(exception_case_1(content)[0]) #3
+		alert_types.append(exception_case_1_1(content)[1]) #4
+		alert_types.append(exception_case_1_1(content)[0]) #5
 	elif(exception_case == "Case_2"):
 		pass
 	elif(exception_case == "Case_3"):
@@ -163,12 +154,10 @@ def alert_appending(alert_log): # APPENDS THE CORRECT DATA DEPENDING IN ALERT_EX
 	elif(exception_case == "Case_4"):
 		alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
-		alert_types.append("Undefined") # Source IP Not defined
 		alert_types.append("Undefined") # Source Port Not defined
-		alert_types.append("Undefined") # Dest IP Not defined
+		alert_types.append("Undefined") # Source IP Not defined
 		alert_types.append("Undefined") # Dest Port Not defined
-		alert_types.append(alert_date_time(content)[0])
-		alert_types.append(alert_date_time(content)[1])
+		alert_types.append("Undefined") # Dest IP Not defined
 	elif(exception_case == "Case_5"):
 		alert_types.append(alert_type(content))
 		alert_types.append(alert_classification(content))
@@ -176,18 +165,13 @@ def alert_appending(alert_log): # APPENDS THE CORRECT DATA DEPENDING IN ALERT_EX
 		alert_types.append("Undefined") # IP Not defined
 		alert_types.append(exception_case_5(content)[1])
 		alert_types.append("Undefined") # IP Not defined
-		alert_types.append(alert_date_time(content)[0])
-		alert_types.append(alert_date_time(content)[1])
 	else:
-		alert_types.append(alert_type(content))
-		alert_types.append(alert_classification(content))
-		alert_types.append(alert_source_ip_port(content)[1])
-		alert_types.append(alert_source_ip_port(content)[0])
-		alert_types.append(alert_dest_ip_port(content)[1])
-		alert_types.append(alert_dest_ip_port(content)[0])
-		alert_types.append(alert_date_time(content)[0])
-		alert_types.append(alert_date_time(content)[1])
-
+		alert_types.append(alert_type(content)) #0
+		alert_types.append(alert_classification(content)) #1
+		alert_types.append(alert_source_ip_port(content)[1]) #2
+		alert_types.append(alert_source_ip_port(content)[0]) #3
+		alert_types.append(alert_dest_ip_port(content)[1]) #4
+		alert_types.append(alert_dest_ip_port(content)[0]) #5
 	return alert_types
 
 def alert_grouping(alert_log): # RUNS THROUGH ALERT LOG DATA 
@@ -203,7 +187,7 @@ def alert_grouping(alert_log): # RUNS THROUGH ALERT LOG DATA
 		if(len(q1) == 0):
 			alert_removal(alert_log)
 		else:
-			alert_full.append(q1)
+			alert_full.append([q1])
 			alert_removal(alert_log)
 			mapper_output.write("%s\n" % q1)
 		i = i + 1
