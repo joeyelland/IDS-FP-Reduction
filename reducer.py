@@ -14,13 +14,13 @@ START SOURCES
 END SOURCES
 #----------------------------------------#
 """
-
+from mapper_output import a1
 import sys
 import ast
 
 #----------------------------------------# GETTING THE MAPPER OUTPUT
-for lines in sys.stdin:
-	words = lines
+#for alarms in sys.stdin:
+#	mapper_output = alarms
 #----------------------------------------# GETTING THE MAPPER OUTPUT
 
 #----------------------------------------# GRAPH FOR FUNCITON TESTING
@@ -2109,7 +2109,7 @@ hierarchy_ip = {
 
 #----------------------------------------# HEIRARCHIES
 
-
+ 
 
 #----------------------------------------# DISSIMILARITY FUNCTION VIA FIND SHORTEST PATH
 #----------------------------------------# Start source [2]
@@ -2138,24 +2138,20 @@ def find_dissimilarity(graph, start, end_1, end_2):
 	length_2 = len(distance_2)
 
 	if(length_1 > length_2):
-		print('Case_1')
 		length = length_1 - length_2
 		for i in distance_1:
 			if i not in distance_2:
 				non_matches = non_matches + 1
 		total_distance = (non_matches * 2) - length
 	elif(length_2 > length_1):
-		print('Case_2')
 		length = length_2 - length_1
 		for i in distance_2:
 			if i not in distance_1:
 				non_matches = non_matches + 1
 		total_distance = (non_matches * 2) - length
 	elif(length_1 == 1 and length_2 == 1):
-		print('Case_3')
 		total_distance = 1
 	else:
-		print('Case_4')
 		for i in distance_1:
 			if i not in distance_2:
 				non_matches = non_matches + 1
@@ -2164,8 +2160,79 @@ def find_dissimilarity(graph, start, end_1, end_2):
 	return total_distance
 #----------------------------------------# DISSIMILARITY FUNCTION VIA FIND SHORTEST PATH
 
+#----------------------------------------# SETTING MINIMUM SIZE PARAMETER
+def setting_minsize(ms):
+	eps = 0.05
+	robust_1 = ms
+	robust_2 = (1 - eps) * ms
+	robust_3 = (1 + eps) * ms
+
+	#RUN CLUSTERING ALGORITHM
+	#MS IS EPS-ROBUST IF ALL SIMULATIONS HAVE THE SAME RESULT
+	#ITERATIVELY RUN THIS FUNCTION UNTIL ALL 3 VALUES ARE THE SAME
+
+	return ms
+#----------------------------------------# SETTING MINIMUM SIZE PARAMETER
+
+#----------------------------------------# ATTRIBUTE SELECTION HEURISTIC
+def attribute_selection(alarm):
+	if alarm == "source_port":
+		return 2, hierarchy_port, "ANY_PORT"
+
+	elif alarm == "source_ip":
+		return 3, hierarchy_ip,"ANY_IP"
+
+	elif alarm == "dest_port":
+		return 4, hierarchy_port, "ANY_PORT"
+
+	elif alarm == "dest_ip":
+		return 5, hierarchy_ip, "ANY_IP"
+
+	else:
+		return "No attribute selected"
+#----------------------------------------# ATTRIBUTE SELECTION HEURISTIC
+
+#----------------------------------------# REMOVING ALARM AFTER IT HAS BEEN GENERALIZED
+def alarm_removal(alarm):
+	alarm_log.remove(alarm)
+	return alarm_log
+#----------------------------------------# REMOVING ALARM AFTER IT HAS BEEN GENERALIZED
+
+#----------------------------------------# CHANGES ATTRIBUTE TO ITS CORRESPONDING PARENT IN THE DAG
+def dag_parent(alarm, attribute):
+	if attribute[1] == hierarchy_port:
+		if alarm[attribute[0]] in priv_port_list:
+			return hierarchy_port.keys()[hierarchy_port.values().index(priv_port_list)]
+		else:
+			return hierarchy_port.keys()[hierarchy_port.values().index(non_priv_port_list)]
+
+	elif attribute[1] == hierarchy_ip:
+		if alarm[attribute[0]] in http_ftp_ip:
+			return hierarchy_ip.keys()[hierarchy_ip.values().index(http_ftp_ip)]
+		elif alarm[attribute[0]] in internet_ip:
+			return hierarchy_ip.keys()[hierarchy_ip.values().index(internet_ip)]
+		else:
+			return hierarchy_ip.keys()[hierarchy_ip.values().index(firewall_ip)]
+	else:
+		return Error
+#----------------------------------------# CHANGES ATTRIBUTE TO ITS CORRESPONDING PARENT IN THE DAG
+
+#----------------------------------------# GENERALIZING
+def generalization(alarm, attribute):
+	potential_cluster = []
+	minimum_size = setting_minsize(500)
+	count = 0
+	attribute = attribute_selection("dest_port")
+
+	while count < minimum_size:
+		potential_cluster.append(alarm[count])
+		count = count + 1
+
+	for i in potential_cluster:
+		i[attribute[0]] = dag_parent(i, attribute)
 
 
-#print(find_shortest_path(hierarchy_ip, 'ANY_IP', 'ip3'))
+	return len(potential_cluster)
+#----------------------------------------# GENERALIZING
 
-print(find_dissimilarity(hierarchy_ip, 'ANY_IP', 'ip3', '239.255.255.250'))
+print(generalization(a1,"hello"))
