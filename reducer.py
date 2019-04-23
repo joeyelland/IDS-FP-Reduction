@@ -2109,8 +2109,6 @@ hierarchy_ip = {
 
 #----------------------------------------# HEIRARCHIES
 
- 
-
 #----------------------------------------# DISSIMILARITY FUNCTION VIA FIND SHORTEST PATH
 #----------------------------------------# Start source [2]
 def find_shortest_path(graph, start, end, path=[]):
@@ -2174,22 +2172,23 @@ def setting_minsize(ms):
 	return ms
 #----------------------------------------# SETTING MINIMUM SIZE PARAMETER
 
+def attribute_count(list1, list2): 
+	att_diff = list(set(list1) - set(list2))
+	att_ind = []
+
+	for i in att_diff:
+		att_ind.append(list1.index(i))
+	return sorted(att_ind), len(att_diff)
+
 #----------------------------------------# ATTRIBUTE SELECTION HEURISTIC
-def attribute_selection(alarm):
-	if alarm == "source_port":
-		return 2, hierarchy_port, "ANY_PORT"
+def attribute_selection(list1, list2): 
+	count = [0, 0, 0, 0, 0, 0] # INDEX REPRESENTS EACH ATTRIBUTE
 
-	elif alarm == "source_ip":
-		return 3, hierarchy_ip,"ANY_IP"
+	for i in attribute_count(list1, list2):
+		count[i] = count[i] + 1 
+	
+	return count
 
-	elif alarm == "dest_port":
-		return 4, hierarchy_port, "ANY_PORT"
-
-	elif alarm == "dest_ip":
-		return 5, hierarchy_ip, "ANY_IP"
-
-	else:
-		return "No attribute selected"
 #----------------------------------------# ATTRIBUTE SELECTION HEURISTIC
 
 #----------------------------------------# REMOVING ALARM AFTER IT HAS BEEN GENERALIZED
@@ -2201,38 +2200,59 @@ def alarm_removal(alarm):
 #----------------------------------------# CHANGES ATTRIBUTE TO ITS CORRESPONDING PARENT IN THE DAG
 def dag_parent(alarm, attribute):
 	if attribute[1] == hierarchy_port:
+
 		if alarm[attribute[0]] in priv_port_list:
 			return hierarchy_port.keys()[hierarchy_port.values().index(priv_port_list)]
 		else:
 			return hierarchy_port.keys()[hierarchy_port.values().index(non_priv_port_list)]
 
 	elif attribute[1] == hierarchy_ip:
+
 		if alarm[attribute[0]] in http_ftp_ip:
 			return hierarchy_ip.keys()[hierarchy_ip.values().index(http_ftp_ip)]
 		elif alarm[attribute[0]] in internet_ip:
 			return hierarchy_ip.keys()[hierarchy_ip.values().index(internet_ip)]
 		else:
 			return hierarchy_ip.keys()[hierarchy_ip.values().index(firewall_ip)]
+	
 	else:
-		return Error
+		return "Error"
 #----------------------------------------# CHANGES ATTRIBUTE TO ITS CORRESPONDING PARENT IN THE DAG
 
-#----------------------------------------# GENERALIZING
-def generalization(alarm, attribute):
-	potential_cluster = []
-	minimum_size = setting_minsize(500)
-	count = 0
-	attribute = attribute_selection("dest_port")
 
-	while count < minimum_size:
-		potential_cluster.append(alarm[count])
-		count = count + 1
+#----------------------------------------# CHECK IF CLUSTER ALREADY EXISTS
+#----------------------------------------# CHECK IF CLUSTER ALREADY EXISTSL
 
-	for i in potential_cluster:
-		i[attribute[0]] = dag_parent(i, attribute)
-
-
-	return len(potential_cluster)
 #----------------------------------------# GENERALIZING
 
-print(generalization(a1,"hello"))
+def alarm_clustering(alarms):
+	alarm_clusters = []
+
+	min_size = 500
+
+	for i in alarms:
+		for j in alarms[alarms.index(i) + 1 : ]:
+			attr_sel = attribute_count(i, j)
+			if(i == j): #IF TWO ALARMS IDENTICAL GENERALIZE $$ WORKING $$
+				print("case_1")
+				alarm_clusters.append(i)
+			elif(attr_sel[1] <= 2): #IF LESS THAN TWO DIFFERENCES, GENERALIZE TWO DIFFERENCEs AND ADD TO CLUSTER
+				print("case_2")
+				generalization = i
+				for k in attr_sel[0]:
+					if 2 <= k <= 5:
+						generalization[k] = dag_parent(i, i[k])
+					else:
+						continue
+			else:
+				print("case_3")
+				continue
+	return alarm_clusters
+#----------------------------------------# GENERALIZING
+
+
+a2 = [['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251'],['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50495', '192.168.202.79', '80', '192.168.229.251']]
+
+print(alarm_clustering(a2))
+
+#[0 Alarm Type, 1 Alarm Classification, 2 Source Port, 3 Source IP, 4 Dest Port, 5 Dest IP]
