@@ -2175,12 +2175,16 @@ def attribute_checker(list1, list2): # USING LISTS
 	different_attributes = [i for i in list1 + list2 if i not in list1 or i not in list2] 
 	list2_att = []
 	list2_att_ind = []
+	output_list = []
 
 	for i in different_attributes:
 		if i in list2:
 			list2_att.append(i)
-			list2_att_ind.append(list2.index(i)) 
-	return list2_att, sorted(list2_att_ind), len(list2_att_ind)
+			list2_att_ind.append(list2.index(i))
+
+	output_list.append(list2_att)
+	output_list.append(list2_att_ind)
+	return output_list
 
 def attribute_checker_2(list1, list2): # USING SETS
 	different_attributes = list(set(list2) - set(list1))
@@ -2205,7 +2209,7 @@ def dag_parent(attribute, next):
 	if(attribute == 2 or attribute == 4):
 		return hierarchy_port.keys()[hierarchy_port.values().index(priv_port_list)] # PRIVILEDGED
 		return hierarchy_port.keys()[hierarchy_port.values().index(non_priv_port_list)] # NON-PRIVILEDGED
-	elif(attribute == 3 or attribute == 5)
+	elif(attribute == 3 or attribute == 5):
 		return hierarchy_ip.keys()[hierarchy_ip.values().index(http_ftp_ip)] # HTTP/FTP
 		return hierarchy_ip.keys()[hierarchy_ip.values().index(internet_ip)] # INTERNET
 		return hierarchy_ip.keys()[hierarchy_ip.values().index(firewall_ip)] # FIREWALL
@@ -2239,27 +2243,29 @@ def alarm_clustering_identical_alarms(alarms):
 #----------------------------------------# GENERALIZING: CASE 1 - WHEN TWO ALARMS ARE IDENTICAL
 
 #----------------------------------------# GENERALIZE TO PARENT IN DAG
-def cluster_case_2(alarms):
+def alarm_generalize(alarms):
 	for i in alarms:
 		count_1 = 0
 		for j in alarms[alarms.index(i) + 1:]:
-			diff = list(attribute_checker(i, j))
-			if(diff[2] == 0):
-				print("I am the same!")
-				alarms = alarm_removal(alarms, j)
-			elif(diff[2] <= 2):
-				print(diff[1])
-				if(diff[1][0] == 2):
-					j[2] = dag_parent(2)
-				#elif(diff[1][0] == 3):
-				#elif(diff[1][0] == 4):
-				#elif(diff[1][0] == 5):
+			diff = attribute_checker(i, j)
+			diff_length = len(attribute_checker(i, j)[1])
 
-				alarms = alarm_removal(alarms, j)
+			#print(diff)
+			#print(diff_length)
+
+			if(diff_length == 0):
+				print("I am the same!")
+				#alarms = alarm_removal(alarms, j)
+			elif(diff_length <= 2):
+				if(diff[1][0] == 2):
+					j[2] = dag_parent(2, 0) #FIND OUT HOW TO SEE WHAT INDEX MATCHES TO WHAT DIFFERENCE
+				else:
+					print("I only care about 2!")
+				#alarms = alarm_removal(alarms, j)
 			else:
-				print("Well then...")
+				#print("Well then...")
 				alarms = alarm_removal(alarms, j)
-	return "Done"
+	return alarms
 #----------------------------------------# GENERALIZE TO PARENT IN DAG
 
 #elif(diff[2] <= 2): #CASE 2 - TWO DIFFERENCES WITH ATTRIBUTES, GENERALIZE TWO DIFFERENCES 
@@ -2285,16 +2291,19 @@ a3 = [
 
 x1 = ['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '90', '192.168.202.79', '80', '192.168.229.251']
 x2 = ['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '3232', '192.168.202.7', '80', '192.168.229.251']
-
 x3 = [1,2,3,4,5]
 x4 = [1,2,3,4,6]
 
 #print(attribute_checker(x1, x2))
-
-print(cluster_case_2(a2))
-
-
+print(alarm_generalize(a2))
 """
+[['90', '60'], [2, 4], 2]
+I am different!
+[['90', '60'], [2, 4], 2]
+I am different!
+Done
+
+
 for i in alarm_clustering_identical_alarms(a2):
 	print i
 
