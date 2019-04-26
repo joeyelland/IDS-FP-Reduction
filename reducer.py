@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 """reducer.py"""
 
@@ -15,14 +15,15 @@ START SOURCES
 END SOURCES
 #----------------------------------------#
 """
-from mapper_output import a1
-from mapper_output_small import b1
 import sys
 import ast
 
 #----------------------------------------# GETTING THE MAPPER OUTPUT
-#for alarms in sys.stdin:
-#	mapper_output = alarms
+for alarm_logs in sys.stdin:
+	cheese = alarm_logs
+
+
+mapper_output = ast.literal_eval(cheese)
 #----------------------------------------# GETTING THE MAPPER OUTPUT
 
 #----------------------------------------# GRAPH FOR FUNCITON TESTING
@@ -2229,9 +2230,9 @@ def alarm_clustering_identical_alarms(alarms):
 #----------------------------------------# GENERALIZE TO PARENT IN DAG
 def alarm_generalize(alarms):
 	generalized_alarms = []
-	z = 1
+	x = 0
 	for i in alarms:
-		print(z)
+		print(x)
 		for j in alarms[alarms.index(i) + 1:]:
 			diff = attribute_checker(i, j)
 			diff_length = len(attribute_checker(i, j)[1])
@@ -2247,30 +2248,11 @@ def alarm_generalize(alarms):
 				alarms = alarm_removal(alarms, j)
 			else:
 				None
-		z = z + 1
+		x = x + 1
 	return generalized_alarms
 #----------------------------------------# GENERALIZE TO PARENT IN DAG
 
-a2 = [
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '90', '192.168.202.79', '10000', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '80', '192.168.202.79', '80', '192.168.229.251']]
+out = alarm_clustering_identical_alarms(alarm_generalize(mapper_output))
 
-
-a3 = [
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50497', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50499', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50501', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50503', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50504', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50506', '192.168.202.79', '80', '192.168.229.251'],
-	['ET SCAN Nmap Scripting Engine User-Agent Detected (Nmap Scripting Engine)', 'Web Application Attack', '50508', '192.168.202.79', '80', '192.168.229.251']]
-
-for i in alarm_clustering_identical_alarms(alarm_generalize(b1)):
-	print(i)
+with open("file.txt", "w+") as f:
+	f.write(str(out))
