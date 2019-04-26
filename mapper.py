@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 
 """mapper.py"""
 
@@ -19,8 +19,9 @@ END SOURCES
 import sys
 import re
 
-with open("test_dataset_full.pcap") as test_dataset: #Inputting and parsing alert logs line by line 
-	content = test_dataset.readlines()
+content = []
+for line in sys.stdin:
+	content.append(line)
 
 #----------------------------------------# Start source [1]
 def find_nth(string, substring, n):
@@ -179,7 +180,6 @@ def alert_grouping(alert_log): # RUNS THROUGH ALERT LOG DATA
 	i = 0
 	x = 0
 	alert_num = alert_number(content)
-	mapper_output = open("mapper_output.txt","w+")
 
 	while i < alert_num:
 		print(i)
@@ -187,10 +187,11 @@ def alert_grouping(alert_log): # RUNS THROUGH ALERT LOG DATA
 		if(len(q1) == 0):
 			alert_removal(alert_log)
 		else:
-			alert_full.append([q1])
+			alert_full.append(q1)
 			alert_removal(alert_log)
-			mapper_output.write("%s\n" % q1)
 		i = i + 1
+
 	return alert_full
 
-alert_grouping(content) # CALLING FUNCTION
+with open("file.txt", "w+") as f:
+	f.write(str(alert_grouping(content)))
